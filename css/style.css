@@ -1,0 +1,218 @@
+/* =========================
+   Global
+========================= */
+html { scroll-behavior: smooth; }
+body { position: relative; margin: 0; padding: 0; }
+
+/* =========================
+   Fonts
+========================= */
+@font-face {
+  font-family: 'hipeless_brushregular';
+  src: url('fonts/hipeless_brush-webfont.woff2') format('woff2'),
+       url('fonts/hipeless_brush-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'dirty_brushregular';
+  src: url('fonts/dirty_brush-webfont.woff2') format('woff2'),
+       url('fonts/dirty_brush-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* =========================
+   Typography
+========================= */
+.letter-spacing-1 { letter-spacing: 0.06em; }
+
+.hipeless {
+  font-family: 'hipeless_brushregular', cursive;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: 0.03em;
+}
+.hipeless-sub {
+  font-family: 'dirty_brushregular', cursive;
+  text-transform: none;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  letter-spacing: 0.05em;
+}
+h5.text-uppercase {
+  margin-bottom: 0;
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+h3 {
+  font-size: clamp(0.75rem, 3vw, 1.5rem);
+  margin: 0 auto;
+  max-width: 90%;
+  padding: 0 1rem;
+}
+
+/* Section titles */
+#history h1,
+#revival h1,
+#goodwood h1 {
+  font-family: 'dirty_brushregular', cursive;
+  font-size: clamp(2rem, 5vw, 3rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+#mindfolk-streak h2 {
+  font-family: 'dirty_brushregular', cursive;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: 0.06em;
+}
+
+/* Static hero subtitle */
+#type-sub, .type-sub {
+  font-family: 'dirty_brushregular', cursive;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  letter-spacing: 0.06em;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+/* =========================
+   Navbar
+========================= */
+.navbar {
+  transition: background-color .25s ease, color .25s ease, box-shadow .25s ease;
+  justify-content: flex-start !important;
+  z-index: 1000;
+}
+.navbar-brand img { height: clamp(28px, 4vw, 40px); }
+.navbar-brand span {
+  font-family: 'hipeless_brushregular', cursive;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.navbar.navbar-scroll { background-color: transparent; }
+.navbar.navbar-scroll .navbar-brand,
+.navbar.navbar-scroll .nav-link,
+.navbar.navbar-scroll .fa-bars { color: #ffffff !important; }
+
+.navbar.navbar-scrolled {
+  background-color: #ffffff;
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08);
+}
+.navbar.navbar-scrolled .navbar-brand,
+.navbar.navbar-scrolled .nav-link,
+.navbar.navbar-scrolled .fa-bars { color: #212529 !important; }
+
+.navbar .nav-link { color: #fff; transition: color .2s ease; }
+.navbar.navbar-scrolled .nav-link { color: #111; }
+.navbar .nav-link.active {
+  color: #ffc107 !important;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+/* Logo fade helper */
+#nav-logo { transition: opacity .3s ease; }
+#nav-logo.fading { opacity: 0; }
+
+/* Navbar icon images */
+.navbar-nav .nav-icon img {
+  width: 20px; height: 20px; object-fit: contain; display: block;
+}
+
+/* =========================
+   Generic bg helpers
+========================= */
+.bg-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 50vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   HERO (single source of truth)
+========================= */
+.intro {
+  position: relative;
+  min-height: 100vh; /* use 100svh below when supported */
+  background-image: url('../img/mfbackground.png'); /* CSS file is in /css -> use ../img */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.intro .mask {
+  background-color: rgba(0,0,0,0.4);   /* overlay for text readability */
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modern mobile viewport fix */
+@supports (height: 100svh) {
+  .intro { min-height: 100svh; }
+}
+
+/* =========================
+   Footer
+========================= */
+.footer-dark { background-color: #000; }
+
+/* iOS fixed-bg fallback */
+@supports (-webkit-touch-callout: none) {
+  #mindfolk-streak { background-attachment: scroll !important; }
+}
+
+/* =========================
+   Utilities / Components
+========================= */
+.mindfolk-logo { max-height: 35px; width: auto; margin-right: 4px; }
+
+/* Column centering adjustments */
+.col-lg-6.col-md-12 { display: flex; flex-direction: column; }
+.col-lg-6.col-md-12 p.mb-0 { text-align: left; }
+
+/* =========================
+   Media Queries
+========================= */
+@media (max-width: 768px) {
+  .intro { background-position: top center; } /* keep the interesting top visible */
+  .intro img { max-height: 100px; }
+  .intro h3 { font-size: 1.1rem; padding: 0 1rem; }
+
+  .logo-img { max-height: 120px; }
+  h3 { font-size: clamp(0.625rem, 2.5vw, 1.25rem); }
+  .hipeless-sub, h5.text-uppercase { font-size: clamp(1rem, 2.5vw, 1.6rem); }
+
+  #navbarSupportedContent .navbar-nav.d-flex.flex-row { gap: .25rem; }
+  #navbarSupportedContent .nav-icon img { height: 18px; }
+
+  .mindfolk-logo { max-height: 30px; }
+}
+
+@media (max-width: 576px) {
+  .intro img { max-height: 100px; }
+  .intro h3 { font-size: 1rem; }
+
+  .hipeless-sub, h5.text-uppercase { font-size: clamp(0.9rem, 2vw, 1.4rem); }
+  .navbar-brand img { height: clamp(20px, 3vw, 30px); }
+  .navbar-brand span { font-size: clamp(1rem, 2vw, 1.4rem); }
+  #navbarSupportedContent .nav-icon img { height: 16px; }
+
+  .mindfolk-logo { max-height: 25px; }
+}
+@media (max-width: 768px) {
+  .intro { background-position: top center; }
+  .intro img { max-height: 100px; }
+  .intro h3 { font-size: 1.1rem; padding: 0 1rem; }
+}
