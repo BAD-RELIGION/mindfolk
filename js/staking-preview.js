@@ -60,13 +60,13 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     const summaryValidatorEl = nativePanel.querySelector('[data-summary-validator]');
     const validatorDisplayEl = nativePanel.querySelector('[data-validator-display]');
 
-    if (!amountInput || !connectButton || !disconnectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl || !summaryValidatorEl) {
+    if (!amountInput || !connectButton || !disconnectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl) {
       console.warn('staking preview: missing required DOM nodes');
       return;
     }
 
     if (validatorDisplayEl) validatorDisplayEl.textContent = VALIDATOR_VOTE_ACCOUNT;
-    summaryValidatorEl.textContent = `${VALIDATOR_VOTE_ACCOUNT.slice(0, 8)}…${VALIDATOR_VOTE_ACCOUNT.slice(-8)}`;
+    summaryValidatorEl?.textContent && (summaryValidatorEl.textContent = summaryValidatorEl.textContent);
 
     const STATE = {
       wallet: null,
@@ -100,7 +100,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
       const apyReward = cleanAmount * APY_NATIVE;
       summaryAmountEl.textContent = `${formatSol(cleanAmount)} SOL`;
       summaryRewardEl.textContent = `${formatSol(apyReward, 5)} SOL`;
-      summaryValidatorEl.textContent = `${VALIDATOR_VOTE_ACCOUNT.slice(0, 8)}…${VALIDATOR_VOTE_ACCOUNT.slice(-8)}`;
+      summaryValidatorEl?.textContent && (summaryValidatorEl.textContent = summaryValidatorEl.textContent);
     }
 
     function updateQuickButtons() {
