@@ -42,7 +42,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
 
     const rawProvider = window.solana?.isPhantom ? window.solana : window.phantom?.solana?.isPhantom ? window.phantom.solana : null;
     const provider = rawProvider;
-    const connection = new web3.Connection(web3.clusterApiUrl('mainnet-beta'), 'confirmed');
+    const connection = new web3.Connection('https://mainnet.helius-rpc.com/?api-key=393d535c-31f8-4316-bc07-6f6bb8ae1cdf', 'confirmed');
 
     const nativePanel = stakingSection.querySelector('[data-panel="native"]');
     const toggleButtons = Array.from(stakingSection.querySelectorAll('.staking-toggle-btn'));
