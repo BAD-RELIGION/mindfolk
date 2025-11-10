@@ -133,7 +133,8 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         return;
       }
       if (STATE.wallet) {
-        connectButton.textContent = `Connected: ${STATE.wallet.toBase58().slice(0, 4)}…${STATE.wallet.toBase58().slice(-4)}`;
+        const shortKey = STATE.wallet.toBase58();
+        connectButton.textContent = `Connected: ${shortKey.slice(0, 4)}…${shortKey.slice(-4)}`;
         connectButton.disabled = STATE.connecting;
         connectButton.classList.add('btn-outline-light');
         return;
