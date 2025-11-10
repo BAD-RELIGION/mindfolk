@@ -1,32 +1,71 @@
+const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
+
 (() => {
-  document.addEventListener('DOMContentLoaded', () => {
+  const MAX_ATTEMPTS = 60;
+  const RETRY_DELAY_MS = 200;
+
+  function resolveWeb3() {
+    if (typeof window === 'undefined') return undefined;
+    if (window.solanaWeb3) return window.solanaWeb3;
+    if (typeof solanaWeb3 !== 'undefined') return solanaWeb3;
+    const script = document.getElementById('solana-web3-script');
+    const globalName = script?.getAttribute?.('data-global');
+    if (globalName && window[globalName]) return window[globalName];
+    if (window.solana?.Web3) return window.solana.Web3;
+    return undefined;
+  }
+
+  function waitForWeb3(attempt = 0) {
+    const web3 = resolveWeb3();
+    if (web3) {
+      window.solanaWeb3 = web3;
+      const run = () => initStaking(web3);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run, { once: true });
+      } else {
+        run();
+      }
+      return;
+    }
+    if (attempt >= MAX_ATTEMPTS) {
+      console.error('Solana web3 library failed to load.');
+      return;
+    }
+    setTimeout(() => waitForWeb3(attempt + 1), RETRY_DELAY_MS);
+  }
+
+  waitForWeb3();
+
+  function initStaking(web3) {
     const stakingSection = document.getElementById('staking');
     if (!stakingSection) return;
 
-    const web3 = window.solanaWeb3 || null;
-    const connection = web3 ? new web3.Connection(web3.clusterApiUrl('mainnet-beta'), 'confirmed') : null;
+    const provider = window.solana?.isPhantom ? window.solana : null;
+    const connection = new web3.Connection(web3.clusterApiUrl('mainnet-beta'), 'confirmed');
 
     const nativePanel = stakingSection.querySelector('[data-panel="native"]');
-    const liquidPanel = stakingSection.querySelector('[data-panel="liquid"]');
-
     const toggleButtons = Array.from(stakingSection.querySelectorAll('.staking-toggle-btn'));
     const panels = Array.from(stakingSection.querySelectorAll('.staking-panel'));
 
-    const amountInput = nativePanel?.querySelector('#nativeAmount');
-    const validatorInput = nativePanel?.querySelector('#nativeVoteAccount');
-    const quickButtons = Array.from(nativePanel?.querySelectorAll('[data-quick-amount]') || []);
-    const connectButtons = Array.from(stakingSection.querySelectorAll('[data-connect-wallet]'));
-    const submitButton = nativePanel?.querySelector('[data-submit-stake]');
-    const feedbackEl = nativePanel?.querySelector('[data-feedback]');
-    const summaryAmountEl = nativePanel?.querySelector('[data-summary-amount]');
-    const summaryRewardEl = nativePanel?.querySelector('[data-summary-reward]');
-    const summaryValidatorEl = nativePanel?.querySelector('[data-summary-validator]');
+    if (!nativePanel) return;
 
-    if (!nativePanel || !amountInput || !validatorInput || !summaryAmountEl || !summaryRewardEl || !summaryValidatorEl || !feedbackEl || !submitButton) {
+    const amountInput = nativePanel.querySelector('#nativeAmount');
+    const quickButtons = Array.from(nativePanel.querySelectorAll('[data-quick-amount]'));
+    const connectButton = nativePanel.querySelector('[data-connect-wallet]');
+    const submitButton = nativePanel.querySelector('[data-submit-stake]');
+    const feedbackEl = nativePanel.querySelector('[data-feedback]');
+    const summaryAmountEl = nativePanel.querySelector('[data-summary-amount]');
+    const summaryRewardEl = nativePanel.querySelector('[data-summary-reward]');
+    const summaryValidatorEl = nativePanel.querySelector('[data-summary-validator]');
+    const validatorDisplayEl = nativePanel.querySelector('[data-validator-display]');
+
+    if (!amountInput || !connectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl || !summaryValidatorEl) {
+      console.warn('staking preview: missing required DOM nodes');
       return;
     }
 
-    let provider = detectProvider();
+    if (validatorDisplayEl) validatorDisplayEl.textContent = VALIDATOR_VOTE_ACCOUNT;
+    summaryValidatorEl.textContent = `${VALIDATOR_VOTE_ACCOUNT.slice(0, 8)}…${VALIDATOR_VOTE_ACCOUNT.slice(-8)}`;
 
     const STATE = {
       wallet: null,
@@ -46,43 +85,12 @@
       });
     }
 
-    function lamportsToSol(lamports) {
-      return lamports / (web3 ? web3.LAMPORTS_PER_SOL : 1);
-    }
-
-    function truncatePubkey(pubkey) {
-      const str = pubkey.toString();
-      return `${str.slice(0, 4)}…${str.slice(-4)}`;
-    }
-
-    function clearFeedback() {
-      feedbackEl.textContent = '';
-      feedbackEl.className = 'staking-feedback mb-3';
-    }
-
-    function detectProvider() {
-      if (window.solana?.isPhantom || window.solana?.isBackpack || window.solana?.isSolflare) return window.solana;
-      if (window.phantom?.solana) return window.phantom.solana;
-      if (window.backpack?.solana) return window.backpack.solana;
-      if (window.solflare) return window.solflare;
-      return null;
-    }
-
-    function setFeedback(message, type = 'info', explorerUrl = null) {
+    function setFeedback(message, type = 'info') {
       feedbackEl.textContent = '';
       feedbackEl.className = 'staking-feedback mb-3';
       if (!message) return;
       feedbackEl.textContent = message;
       feedbackEl.classList.add(`staking-feedback--${type}`);
-      if (explorerUrl) {
-        const link = document.createElement('a');
-        link.href = explorerUrl;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.textContent = ' View transaction';
-        link.className = 'text-warning text-decoration-underline ms-2';
-        feedbackEl.appendChild(link);
-      }
     }
 
     function updateSummary() {
@@ -91,63 +99,58 @@
       const apyReward = cleanAmount * APY_NATIVE;
       summaryAmountEl.textContent = `${formatSol(cleanAmount)} SOL`;
       summaryRewardEl.textContent = `${formatSol(apyReward, 5)} SOL`;
-
-      const voteAddress = validatorInput.value.trim();
-      summaryValidatorEl.textContent = voteAddress ? `${voteAddress.slice(0, 8)}…${voteAddress.slice(-8)}` : '—';
-    }
-
-    function isValidVoteAddress(value) {
-      if (!web3) return false;
-      if (!value) return false;
-      try {
-        new web3.PublicKey(value);
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
-    function updateSubmitState() {
-      const amount = parseFloat(amountInput.value);
-      const voteAddress = validatorInput.value.trim();
-      const hasAmount = Number.isFinite(amount) && amount > 0;
-      const hasValidator = isValidVoteAddress(voteAddress);
-      const ready = STATE.wallet && hasAmount && hasValidator && !STATE.submitting;
-      submitButton.disabled = !ready;
-    }
-
-    function updateConnectButtons() {
-      connectButtons.forEach((btn) => {
-        if (STATE.wallet) {
-          btn.textContent = `Connected: ${truncatePubkey(STATE.wallet)}`;
-          btn.disabled = STATE.connecting;
-          btn.classList.remove('btn-warning');
-          btn.classList.add('btn-outline-light');
-        } else if (STATE.connecting) {
-          btn.textContent = 'Connecting…';
-          btn.disabled = true;
-        } else {
-          btn.textContent = 'Connect Wallet';
-          btn.disabled = false;
-          btn.classList.add('btn-warning');
-          btn.classList.remove('btn-outline-light');
-        }
-      });
+      summaryValidatorEl.textContent = `${VALIDATOR_VOTE_ACCOUNT.slice(0, 8)}…${VALIDATOR_VOTE_ACCOUNT.slice(-8)}`;
     }
 
     function updateQuickButtons() {
-      if (!web3 || !STATE.wallet) return;
       quickButtons.forEach((btn) => {
         const fraction = parseFloat(btn.dataset.quickAmount || '0');
         if (!Number.isFinite(fraction) || fraction <= 0) return;
+        btn.disabled = !STATE.wallet;
+        if (!STATE.wallet) {
+          btn.title = 'Connect Phantom to use this shortcut.';
+          return;
+        }
         const lamports = STATE.balanceLamports * fraction;
-        const sol = lamportsToSol(lamports);
+        const sol = lamports / web3.LAMPORTS_PER_SOL;
         btn.title = `Use ${Math.round(fraction * 100)}% (~${formatSol(sol, 4)} SOL)`;
       });
     }
 
+    function updateSubmitState() {
+      const amount = parseFloat(amountInput.value);
+      const hasAmount = Number.isFinite(amount) && amount > 0;
+      submitButton.disabled = !(STATE.wallet && hasAmount && !STATE.submitting);
+    }
+
+    function updateConnectButton() {
+      connectButton.classList.remove('btn-warning', 'btn-outline-light', 'btn-secondary');
+      if (!provider) {
+        connectButton.textContent = 'Install Phantom Wallet';
+        connectButton.disabled = true;
+        connectButton.classList.add('btn-secondary');
+        setFeedback('Phantom wallet not detected. Install the Phantom extension and refresh this page.', 'error');
+        return;
+      }
+      if (STATE.wallet) {
+        connectButton.textContent = `Connected: ${STATE.wallet.toBase58().slice(0, 4)}…${STATE.wallet.toBase58().slice(-4)}`;
+        connectButton.disabled = STATE.connecting;
+        connectButton.classList.add('btn-outline-light');
+        return;
+      }
+      if (STATE.connecting) {
+        connectButton.textContent = 'Connecting Phantom…';
+        connectButton.disabled = true;
+        connectButton.classList.add('btn-warning');
+        return;
+      }
+      connectButton.textContent = 'Connect Phantom Wallet';
+      connectButton.disabled = false;
+      connectButton.classList.add('btn-warning');
+    }
+
     async function refreshBalance() {
-      if (!connection || !STATE.wallet) return;
+      if (!STATE.wallet) return;
       try {
         const lamports = await connection.getBalance(STATE.wallet, 'confirmed');
         STATE.balanceLamports = lamports;
@@ -158,30 +161,35 @@
       }
     }
 
-    function bindWalletListeners(currentProvider) {
-      if (!currentProvider || STATE.listenersBound) return;
-      currentProvider.on?.('disconnect', () => {
+    function bindProviderEvents() {
+      if (!provider || STATE.listenersBound || typeof provider.on !== 'function') return;
+      provider.on('disconnect', () => {
         STATE.wallet = null;
         STATE.balanceLamports = 0;
-        updateConnectButtons();
+        updateConnectButton();
+        updateQuickButtons();
         updateSubmitState();
-        clearFeedback();
+        setFeedback('Wallet disconnected.', 'info');
       });
-      currentProvider.on?.('accountChanged', (newAccount) => {
+      provider.on('accountChanged', (newAccount) => {
         if (!newAccount) {
           STATE.wallet = null;
           STATE.balanceLamports = 0;
-          updateConnectButtons();
+          updateConnectButton();
+          updateQuickButtons();
           updateSubmitState();
-          clearFeedback();
+          setFeedback('Wallet disconnected.', 'info');
           return;
         }
         try {
-          const next = new web3.PublicKey(newAccount);
-          STATE.wallet = next;
+          const nextKey = typeof newAccount === 'string' ? newAccount : newAccount?.toString?.();
+          if (!nextKey) return;
+          STATE.wallet = new web3.PublicKey(nextKey);
           refreshBalance();
-          updateConnectButtons();
+          updateConnectButton();
+          updateQuickButtons();
           updateSubmitState();
+          setFeedback('Switched Phantom account.', 'info');
         } catch (err) {
           console.warn('Account change error', err);
         }
@@ -190,68 +198,48 @@
     }
 
     async function connectWallet() {
-      if (STATE.connecting) return;
-      provider = detectProvider();
       if (!provider) {
-        setFeedback('No Solana wallet detected. Install Phantom, Solflare, Backpack, or another wallet and reload this page via https://.', 'error');
+        setFeedback('Phantom wallet not detected. Install the Phantom extension and refresh this page.', 'error');
         return;
       }
-
+      if (STATE.wallet || STATE.connecting) return;
       STATE.connecting = true;
-      updateConnectButtons();
+      updateConnectButton();
       try {
-        const resp = await provider.connect?.() ?? {};
-        const pubkey = resp?.publicKey
-          ? new web3.PublicKey(resp.publicKey)
-          : provider.publicKey
-            ? new web3.PublicKey(provider.publicKey)
-            : null;
-        STATE.wallet = pubkey ? new web3.PublicKey(pubkey) : null;
-        bindWalletListeners(provider);
-        setFeedback('Wallet connected.', 'success');
+        const resp = await provider.connect();
+        const pubkey = resp?.publicKey || provider.publicKey;
+        if (!pubkey) throw new Error('Wallet did not provide a public key.');
+        STATE.wallet = new web3.PublicKey(pubkey.toString());
+        bindProviderEvents();
         await refreshBalance();
+        setFeedback('Phantom wallet connected.', 'success');
       } catch (err) {
         if (err?.code === 4001) {
           setFeedback('Wallet connection cancelled.', 'error');
         } else {
           console.error('Wallet connect error', err);
-          setFeedback('Failed to connect wallet.', 'error');
+          setFeedback(err?.message || 'Failed to connect wallet.', 'error');
         }
       } finally {
         STATE.connecting = false;
-        updateConnectButtons();
+        updateConnectButton();
+        updateQuickButtons();
         updateSubmitState();
       }
     }
 
     async function handleStake(event) {
       event.preventDefault();
-      clearFeedback();
+      setFeedback('');
 
-      provider = detectProvider();
-
-      if (!web3 || !connection) {
-        setFeedback('Solana Web3 library failed to load.', 'error');
-        return;
-      }
-      if (!provider) {
-        setFeedback('No wallet available in this browser context.', 'error');
-        return;
-      }
-      if (!STATE.wallet) {
-        setFeedback('Connect your wallet before staking.', 'error');
+      if (!provider || !STATE.wallet) {
+        setFeedback('Connect your Phantom wallet before staking.', 'error');
         return;
       }
 
       const amount = parseFloat(amountInput.value);
-      const voteAddress = validatorInput.value.trim();
-
       if (!Number.isFinite(amount) || amount <= 0) {
         setFeedback('Enter a stake amount greater than zero.', 'error');
-        return;
-      }
-      if (!isValidVoteAddress(voteAddress)) {
-        setFeedback('Enter a valid validator vote account address.', 'error');
         return;
       }
 
@@ -262,14 +250,13 @@
       submitButton.disabled = true;
       submitButton.textContent = 'Staking…';
       amountInput.disabled = true;
-      validatorInput.disabled = true;
 
       try {
         const rentExemptLamports = await connection.getMinimumBalanceForRentExemption(web3.StakeProgram.space, 'confirmed');
         const totalLamports = rentExemptLamports + lamports;
 
         if (STATE.balanceLamports < totalLamports) {
-          const needed = lamportsToSol(totalLamports);
+          const needed = totalLamports / web3.LAMPORTS_PER_SOL;
           setFeedback(`Insufficient balance. You need ~${formatSol(needed, 4)} SOL including rent-exempt reserve.`, 'error');
           return;
         }
@@ -294,14 +281,13 @@
         const delegateIx = web3.StakeProgram.delegate({
           stakePubkey: stakeAccount.publicKey,
           authorizedPubkey: STATE.wallet,
-          votePubkey: new web3.PublicKey(voteAddress)
+          votePubkey: new web3.PublicKey(VALIDATOR_VOTE_ACCOUNT)
         });
 
         const transaction = new web3.Transaction().add(createAccountIx, initStakeIx, delegateIx);
         transaction.feePayer = STATE.wallet;
         const latestBlockhash = await connection.getLatestBlockhash('finalized');
         transaction.recentBlockhash = latestBlockhash.blockhash;
-
         transaction.partialSign(stakeAccount);
 
         const signedTx = await provider.signTransaction(transaction);
@@ -316,7 +302,6 @@
         );
 
         setFeedback('Stake delegation submitted successfully.', 'success', `https://solscan.io/tx/${signature}`);
-
         amountInput.value = '';
         updateSummary();
         await refreshBalance();
@@ -328,7 +313,6 @@
         STATE.submitting = false;
         submitButton.textContent = 'Stake SOL';
         amountInput.disabled = false;
-        validatorInput.disabled = false;
         updateSubmitState();
       }
     }
@@ -346,9 +330,7 @@
         panel.setAttribute('aria-hidden', String(!isActive));
         if (isActive) {
           const numInput = panel.querySelector('input[type="number"]');
-          if (numInput) {
-            numInput.dispatchEvent(new Event('input', { bubbles: true }));
-          }
+          if (numInput) numInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
       });
     }
@@ -367,11 +349,11 @@
         const fraction = parseFloat(btn.dataset.quickAmount || '0');
         if (!Number.isFinite(fraction) || fraction <= 0) return;
         if (!STATE.wallet) {
-          setFeedback('Connect a wallet to use quick stake amounts.', 'error');
+          setFeedback('Connect Phantom to use quick stake amounts.', 'error');
           return;
         }
         const lamports = STATE.balanceLamports * fraction;
-        const sol = lamportsToSol(lamports);
+        const sol = lamports / web3.LAMPORTS_PER_SOL;
         amountInput.value = formatSol(sol, 4);
         updateSummary();
         updateSubmitState();
@@ -383,53 +365,48 @@
       updateSubmitState();
     });
 
-    validatorInput.addEventListener('input', () => {
-      updateSummary();
-      updateSubmitState();
-    });
-
-    connectButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (STATE.wallet) return;
-        connectWallet();
-      });
-    });
-
-    submitButton.addEventListener('click', () => {
-      if (submitButton.disabled) return;
+    connectButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      connectWallet();
     });
 
     nativePanel.querySelector('form')?.addEventListener('submit', handleStake);
 
     updateSummary();
+    updateQuickButtons();
     updateSubmitState();
-    updateConnectButtons();
+    updateConnectButton();
 
-    provider = detectProvider();
-    if (provider?.connect) {
-      provider.connect({ onlyIfTrusted: true }).then((resp) => {
-        if (resp?.publicKey) {
-          STATE.wallet = new web3.PublicKey(resp.publicKey);
-          bindWalletListeners(provider);
+    if (provider) {
+      bindProviderEvents();
+      const existing = provider.publicKey;
+      if (existing) {
+        try {
+          STATE.wallet = new web3.PublicKey(existing.toString());
           refreshBalance();
-          updateConnectButtons();
+          updateConnectButton();
           updateSubmitState();
+        } catch (_) {
+          /* ignore */
         }
-      }).catch(() => {});
+      } else {
+        try {
+          provider.connect({ onlyIfTrusted: true })
+            .then((resp) => {
+              const pubkey = resp?.publicKey || provider.publicKey;
+              if (!pubkey) return;
+              STATE.wallet = new web3.PublicKey(pubkey.toString());
+              bindProviderEvents();
+              refreshBalance();
+              updateConnectButton();
+              updateSubmitState();
+              setFeedback('Phantom wallet connected.', 'success');
+            })
+            .catch(() => {});
+        } catch (_) {
+          /* ignore */
+        }
+      }
     }
-
-    const MOCK_STATS = {
-      apy: 7.4,
-      commission: 5,
-      stakers: 128
-    };
-    const apyEl = document.querySelector('[data-staking-apy]');
-    const commissionEl = document.querySelector('[data-staking-commission]');
-    const stakersEl = document.querySelector('[data-staking-stakers]');
-    if (apyEl) apyEl.textContent = MOCK_STATS.apy.toFixed(1) + '%';
-    if (commissionEl) commissionEl.textContent = MOCK_STATS.commission.toFixed(1) + '%';
-    if (stakersEl) stakersEl.textContent = MOCK_STATS.stakers.toLocaleString();
-  });
+  }
 })();
-
-
