@@ -372,23 +372,10 @@
                     />
                     <span class="input-group-text bg-transparent text-white border-0 pe-0">SOL</span>
                   </div>
-                  <label for="nativeVoteAccount" class="form-label text-uppercase small text-muted mt-3">Validator Vote Address</label>
-                  <div class="input-group input-group-lg mb-3">
-                    <span class="input-group-text bg-transparent text-white border-0 ps-0">
-                      <i class="fa-solid fa-server"></i>
-                    </span>
-                    <input
-                      type="text"
-                      class="form-control bg-transparent text-white border-0"
-                      id="nativeVoteAccount"
-                      name="nativeVoteAccount"
-                      placeholder="Enter validator vote account"
-                      autocapitalize="none"
-                      autocomplete="off"
-                      spellcheck="false"
-                    />
+                  <div class="staking-validator mb-3">
+                    <span class="form-label text-uppercase small text-muted d-block">Validating to</span>
+                    <div class="validator-address" data-validator-display>MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB</div>
                   </div>
-                  <div class="form-text text-warning mb-3">Paste any Solana validator vote account address (e.g. Vote111111111111111111111111111111111111111).</div>
                   <div class="d-flex flex-wrap gap-2 mb-3 quick-amounts">
                     <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.25">25%</button>
                     <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.5">50%</button>
@@ -536,7 +523,7 @@
     </footer>
 
     <script src="js/mdb.umd.min.js"></script>
-    <script src="https://unpkg.com/@solana/web3.js@1.95.1/lib/index.iife.min.js" integrity="sha384-hkVVm5WTurKxzN2YVFjSjTY0nw33wA0htI5rv/2Hgi1lwuJiFq0Xt80CE2ZIJQ1c" crossorigin="anonymous"></script>
+    <script id="solana-web3-script" src="https://unpkg.com/@solana/web3.js@1.95.1/lib/index.iife.min.js" integrity="sha384-hkVVm5WTurKxzN2YVFjSjTY0nw33wA0htI5rv/2Hgi1lwuJiFq0Xt80CE2ZIJQ1c" crossorigin="anonymous"></script>
     <script src="js/staking-preview.js"></script>
 
     <script>
