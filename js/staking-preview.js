@@ -51,6 +51,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
 
     const amountInput = nativePanel.querySelector('#nativeAmount');
     const quickButtons = Array.from(nativePanel.querySelectorAll('[data-quick-amount]'));
+    const balanceEl = nativePanel.querySelector('[data-wallet-balance]');
     const connectButton = nativePanel.querySelector('[data-connect-wallet]');
     const disconnectButton = nativePanel.querySelector('[data-disconnect-wallet]');
     const submitButton = nativePanel.querySelector('[data-submit-stake]');
@@ -60,7 +61,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     const summaryValidatorEl = nativePanel.querySelector('[data-summary-validator]');
     const validatorDisplayEl = nativePanel.querySelector('[data-validator-display]');
 
-    if (!amountInput || !connectButton || !disconnectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl) {
+    if (!amountInput || !connectButton || !disconnectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl || !balanceEl) {
       console.warn('staking preview: missing required DOM nodes');
       return;
     }
@@ -107,8 +108,8 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
       quickButtons.forEach((btn) => {
         const fraction = parseFloat(btn.dataset.quickAmount || '0');
         if (!Number.isFinite(fraction) || fraction <= 0) return;
-        btn.disabled = !STATE.wallet;
-        if (!STATE.wallet) {
+        btn.disabled = !STATE.wallet || STATE.balanceLamports <= 0;
+        if (!STATE.wallet || STATE.balanceLamports <= 0) {
           btn.title = 'Connect Phantom to use this shortcut.';
           return;
         }
@@ -160,10 +161,19 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         const lamports = await connection.getBalance(STATE.wallet, 'confirmed');
         STATE.balanceLamports = lamports;
         updateQuickButtons();
+        const sol = lamports / web3.LAMPORTS_PER_SOL;
+        balanceEl.hidden = false;
+        balanceEl.textContent = `Balance: ${formatSol(sol, 4)} SOL`;
       } catch (err) {
         console.error('Failed to fetch balance', err);
         setFeedback('Unable to fetch wallet balance.', 'error');
       }
+    }
+
+    function resetBalanceDisplay() {
+      balanceEl.hidden = true;
+      balanceEl.textContent = 'Balance: -- SOL';
+      updateQuickButtons();
     }
 
     function bindProviderEvents() {
@@ -172,7 +182,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         STATE.wallet = null;
         STATE.balanceLamports = 0;
         updateConnectButton();
-        updateQuickButtons();
+        resetBalanceDisplay();
         updateSubmitState();
         setFeedback('Wallet disconnected.', 'info');
       });
@@ -181,7 +191,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
           STATE.wallet = null;
           STATE.balanceLamports = 0;
           updateConnectButton();
-          updateQuickButtons();
+          resetBalanceDisplay();
           updateSubmitState();
           setFeedback('Wallet disconnected.', 'info');
           return;
@@ -246,7 +256,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         STATE.submitting = false;
         amountInput.value = '';
         updateSummary();
-        updateQuickButtons();
+        resetBalanceDisplay();
         updateSubmitState();
         updateConnectButton();
         setFeedback('Wallet disconnected.', 'info');
