@@ -40,7 +40,8 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     const stakingSection = document.getElementById('staking');
     if (!stakingSection) return;
 
-    const provider = window.solana?.isPhantom ? window.solana : null;
+    const rawProvider = window.solana?.isPhantom ? window.solana : window.phantom?.solana?.isPhantom ? window.phantom.solana : null;
+    const provider = rawProvider;
     const connection = new web3.Connection(web3.clusterApiUrl('mainnet-beta'), 'confirmed');
 
     const nativePanel = stakingSection.querySelector('[data-panel="native"]');
