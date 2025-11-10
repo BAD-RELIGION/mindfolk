@@ -162,7 +162,7 @@
       </div>
     </section>
 
-    <section class="bg-warning border-bottom p-5 pb-5" id="goodwood">
+    <section class="bg-warning p-5 pb-5" id="goodwood">
       <h1 class="fw-bold text-center mb-2 pt-4 text-white">The Good Wood Show</h1>
       <div class="container my-5">
         <div class="accordion" id="accordionExample">
@@ -183,16 +183,18 @@
               <div class="accordion-body">
                 <div class="container my-4">
                   <div class="row align-items-start g-3">
-                    <div class="col-12 col-md-3 text-center">
-                      <a href="https://youtu.be/CxVaetz5aEM" class="d-inline-block" target="_blank" rel="noopener">
-                        <img
-                          src="img/gwep1.png"
-                          class="img-fluid shadow-1-strong rounded-5"
-                          alt="Good Wood Episode 1 thumbnail"
-                        />
-                      </a>
+                    <div class="col-12 col-lg-6">
+                      <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-1-strong goodwood-embed">
+                        <iframe
+                          src="https://www.youtube.com/embed/CxVaetz5aEM?rel=0"
+                          title="Good Wood Show EP1 - Kais from Okay Bears"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowfullscreen
+                          loading="lazy"
+                        ></iframe>
+                      </div>
                     </div>
-                    <div class="col-12 col-md-9">
+                    <div class="col-12 col-lg-6">
                       <a href="https://youtu.be/CxVaetz5aEM" target="_blank" rel="noopener">
                         <h5 class="mb-3 text-muted"><strong>Good Wood Show EP1 - Kais from Okay Bears: "Doing good can make money!"</strong></h5>
                       </a>
@@ -226,16 +228,18 @@
               <div class="accordion-body">
                 <div class="container my-4">
                   <div class="row align-items-start g-3">
-                    <div class="col-12 col-md-3 text-center">
-                      <a href="https://youtu.be/Rl7fwkMdHeg?si=NETRcrtS4_STrsut" class="d-inline-block" target="_blank" rel="noopener">
-                        <img
-                          src="img/gwep2.png"
-                          class="img-fluid shadow-1-strong rounded-5"
-                          alt="Good Wood Episode 2 thumbnail"
-                        />
-                      </a>
+                    <div class="col-12 col-lg-6">
+                      <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-1-strong goodwood-embed">
+                        <iframe
+                          src="https://www.youtube.com/embed/Rl7fwkMdHeg?rel=0"
+                          title="Good Wood Show EP2 - Ian Cummings / Photo Finish"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowfullscreen
+                          loading="lazy"
+                        ></iframe>
+                      </div>
                     </div>
-                    <div class="col-12 col-md-9">
+                    <div class="col-12 col-lg-6">
                       <a href="https://youtu.be/Rl7fwkMdHeg?si=NETRcrtS4_STrsut" target="_blank" rel="noopener">
                         <h5 class="mb-3 text-muted"><strong>Good Wood Show EP2 - Ian Cummings / Photo Finish: "Every single one of my friends thinks web3 is a scam." </strong></h5>
                       </a>
@@ -333,13 +337,13 @@
       <div class="container my-5">
         <div class="row">
           <div class="col-12">
-            <h1 class="fw-bold text-center mb-5 text-white staking-title">Mindfolk Validator</h1>
+            <h1 class="fw-bold text-center mb-4 text-white staking-title">Mindfolk Validator</h1>
           </div>
         </div>
         <div class="row g-4 justify-content-center">
           <div class="col-lg-8 col-xl-7">
             <div class="staking-card rounded-4 shadow-lg">
-              <div class="validator-callout text-white mb-4">
+              <div class="validator-callout text-white mb-4 text-center">
                 <p class="mb-0 validator-description">
                   Mindfolk runs a performance-optimized Solana validator with 24/7 monitoring, geo-redundant infrastructure, and a community-first commission. Staking with us supports decentralization while routing rewards back to the Mindfolk ecosystem.
                 </p>
@@ -349,19 +353,20 @@
                 <button type="button" class="staking-toggle-btn" data-mode="liquid" aria-selected="false">Liquid Staking</button>
               </div>
               <div class="staking-panel active" data-panel="native" data-apy="0.07" data-token-symbol="SOL" data-reward-symbol="SOL">
-                <div class="staking-panel-header">
-                  <h2 class="h5 mb-2 text-white">Delegate SOL to the Mindfolk Validator</h2>
-                  <p class="text-muted mb-0">Stake directly with our validator. Rewards compound automatically every epoch.</p>
-                </div>
                 <form class="staking-form needs-validation" novalidate>
-                  <label for="nativeAmount" class="form-label text-uppercase small text-muted">Amount (SOL)</label>
-                  <div class="input-group input-group-lg mb-3">
-                    <span class="input-group-text bg-transparent text-white border-0 ps-0">
-                      <i class="fa-brands fa-solar-panel"></i>
-                    </span>
+                  <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2 staking-balance-row">
+                    <div class="staking-balance text-muted text-end flex-grow-1" data-wallet-balance hidden>Balance: -- SOL</div>
+                    <div class="d-flex flex-wrap gap-2 quick-amounts">
+                      <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.25">25%</button>
+                      <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.5">50%</button>
+                      <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.75">75%</button>
+                      <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="1">Max</button>
+                    </div>
+                  </div>
+                  <div class="input-group input-group-lg mb-3 staking-amount-input-group">
                     <input
                       type="number"
-                      class="form-control bg-transparent text-white border-0"
+                      class="form-control bg-transparent text-white border-0 text-end staking-amount-input"
                       id="nativeAmount"
                       name="nativeAmount"
                       placeholder="0.00"
@@ -372,12 +377,9 @@
                     />
                     <span class="input-group-text bg-transparent text-white border-0 pe-0">SOL</span>
                   </div>
-                  <div class="staking-balance text-muted mb-2" data-wallet-balance hidden>Balance: -- SOL</div>
-                  <div class="d-flex flex-wrap gap-2 mb-3 quick-amounts">
-                    <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.25">25%</button>
-                    <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.5">50%</button>
-                    <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="0.75">75%</button>
-                    <button type="button" class="btn btn-outline-warning btn-sm" data-quick-amount="1">Max</button>
+                  <div class="staking-panel-header text-center mb-4">
+                    <h2 class="h6 mb-1 text-warning">Stake SOL with the Mindfolk Validator</h2>
+                    <p class="text-warning mb-0">Stake directly with our validator. Rewards compound automatically every epoch.</p>
                   </div>
                   <div class="staking-summary rounded-4 p-3 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -511,7 +513,7 @@
     </footer>
 
     <script src="js/mdb.umd.min.js"></script>
-    <script id="solana-web3-script" src="https://unpkg.com/@solana/web3.js@1.95.1/lib/index.iife.min.js" integrity="sha384-hkVVm5WTurKxzN2YVFjSjTY0nw33wA0htI5rv/2Hgi1lwuJiFq0Xt80CE2ZIJQ1c" crossorigin="anonymous"></script>
+    <script id="solana-web3-script" src="https://unpkg.com/@solana/web3.js@1.95.1/lib/index.iife.min.js" integrity="sha384-3bya96mX6iOy4+XVLj0M6Blxh3J3tI4CoLJch1X10WekJe5NWfuVTbE7p9y6OznJ" crossorigin="anonymous"></script>
     <script src="js/staking-preview.js"></script>
 
     <script>
@@ -596,6 +598,8 @@
       (function () {
         const titleEl = document.getElementById('type-title');
         const subEl   = document.getElementById('type-sub');
+
+        if (!titleEl || !subEl) return;
 
         const titleText = "MINDFOLK";
         const subText   = "A new chapter begins. Rebuilding. Rebranding. Rising stronger.";
