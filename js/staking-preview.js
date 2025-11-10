@@ -52,6 +52,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     const amountInput = nativePanel.querySelector('#nativeAmount');
     const quickButtons = Array.from(nativePanel.querySelectorAll('[data-quick-amount]'));
     const connectButton = nativePanel.querySelector('[data-connect-wallet]');
+    const disconnectButton = nativePanel.querySelector('[data-disconnect-wallet]');
     const submitButton = nativePanel.querySelector('[data-submit-stake]');
     const feedbackEl = nativePanel.querySelector('[data-feedback]');
     const summaryAmountEl = nativePanel.querySelector('[data-summary-amount]');
@@ -59,7 +60,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     const summaryValidatorEl = nativePanel.querySelector('[data-summary-validator]');
     const validatorDisplayEl = nativePanel.querySelector('[data-validator-display]');
 
-    if (!amountInput || !connectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl || !summaryValidatorEl) {
+    if (!amountInput || !connectButton || !disconnectButton || !submitButton || !feedbackEl || !summaryAmountEl || !summaryRewardEl || !summaryValidatorEl) {
       console.warn('staking preview: missing required DOM nodes');
       return;
     }
@@ -125,6 +126,7 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
 
     function updateConnectButton() {
       connectButton.classList.remove('btn-warning', 'btn-outline-light', 'btn-secondary');
+      disconnectButton.classList.add('d-none');
       if (!provider) {
         connectButton.textContent = 'Install Phantom Wallet';
         connectButton.disabled = true;
@@ -137,6 +139,8 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         connectButton.textContent = `Connected: ${shortKey.slice(0, 4)}…${shortKey.slice(-4)}`;
         connectButton.disabled = STATE.connecting;
         connectButton.classList.add('btn-outline-light');
+        disconnectButton.classList.remove('d-none');
+        disconnectButton.disabled = STATE.connecting;
         return;
       }
       if (STATE.connecting) {
@@ -226,6 +230,26 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
         updateConnectButton();
         updateQuickButtons();
         updateSubmitState();
+      }
+    }
+
+    async function disconnectWallet() {
+      if (!provider || !STATE.wallet) return;
+      try {
+        await provider.disconnect?.();
+      } catch (err) {
+        console.warn('Wallet disconnect error', err);
+      } finally {
+        STATE.wallet = null;
+        STATE.balanceLamports = 0;
+        STATE.connecting = false;
+        STATE.submitting = false;
+        amountInput.value = '';
+        updateSummary();
+        updateQuickButtons();
+        updateSubmitState();
+        updateConnectButton();
+        setFeedback('Wallet disconnected.', 'info');
       }
     }
 
@@ -369,6 +393,11 @@ const VALIDATOR_VOTE_ACCOUNT = 'MFLKX9vSfWXa4ZcVVpp4GF64ZbNUiX9EjSqtqNMdFXB';
     connectButton.addEventListener('click', (event) => {
       event.preventDefault();
       connectWallet();
+    });
+
+    disconnectButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      disconnectWallet();
     });
 
     nativePanel.querySelector('form')?.addEventListener('submit', handleStake);
