@@ -2,22 +2,62 @@
    Global
 ========================= */
 html { scroll-behavior: smooth; }
-body { position: relative; margin: 0; padding: 0; }
+body { 
+  position: relative; 
+  margin: 0; 
+  padding: 0; 
+  background-color: #000;
+  color: #fff;
+}
+
+/* =========================
+   Theme Switcher
+========================= */
+.theme-label {
+  color: #000;
+  font-size: 0.9rem;
+}
+
+.theme-switcher .theme-btn {
+  min-width: 80px;
+  border-color: rgba(255, 193, 7, 0.5);
+  color: rgba(255, 193, 7, 0.7);
+  background-color: #4a4a4a;
+  transition: all 0.2s ease;
+}
+
+.theme-switcher .theme-btn:hover {
+  border-color: #ffc107;
+  color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.theme-switcher .theme-btn.active {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+.theme-switcher .theme-btn.active:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
 
 /* =========================
    Fonts
 ========================= */
 @font-face {
   font-family: 'hipeless_brushregular';
-  src: url('fonts/hipeless_brush-webfont.woff2') format('woff2'),
-       url('fonts/hipeless_brush-webfont.woff') format('woff');
+  src: url('../fonts/hipeless_brush-webfont.woff2') format('woff2'),
+       url('../fonts/hipeless_brush-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'dirty_brushregular';
-  src: url('fonts/dirty_brush-webfont.woff2') format('woff2'),
-       url('fonts/dirty_brush-webfont.woff') format('woff');
+  src: url('../fonts/dirty_brush-webfont.woff2') format('woff2'),
+       url('../fonts/dirty_brush-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -28,7 +68,7 @@ body { position: relative; margin: 0; padding: 0; }
 .letter-spacing-1 { letter-spacing: 0.06em; }
 
 .hipeless {
-  font-family: 'hipeless_brushregular', cursive;
+  font-family: 'dirty_brushregular', cursive;
   font-size: clamp(1.5rem, 4vw, 2rem);
   letter-spacing: 0.03em;
 }
@@ -51,18 +91,11 @@ h3 {
 }
 
 /* Section titles */
-#history h1,
-#revival h1,
-#goodwood h1 {
+.gallery-title {
   font-family: 'dirty_brushregular', cursive;
   font-size: clamp(2rem, 5vw, 3rem);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-#mindfolk-streak h2 {
-  font-family: 'dirty_brushregular', cursive;
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  letter-spacing: 0.06em;
 }
 
 /* Static hero subtitle */
@@ -94,21 +127,21 @@ h3 {
   white-space: nowrap;
 }
 
-.navbar.navbar-scroll { background-color: transparent; }
+.navbar.navbar-scroll { background-color: #f5f5f5; }
 .navbar.navbar-scroll .navbar-brand,
 .navbar.navbar-scroll .nav-link,
-.navbar.navbar-scroll .fa-bars { color: #ffffff !important; }
+.navbar.navbar-scroll .fa-bars { color: #212529 !important; }
 
 .navbar.navbar-scrolled {
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08);
 }
 .navbar.navbar-scrolled .navbar-brand,
 .navbar.navbar-scrolled .nav-link,
 .navbar.navbar-scrolled .fa-bars { color: #212529 !important; }
 
-.navbar .nav-link { color: #fff; transition: color .2s ease; }
-.navbar.navbar-scrolled .nav-link { color: #111; }
+.navbar .nav-link { color: #212529; transition: color .2s ease; }
+.navbar.navbar-scrolled .nav-link { color: #212529; }
 .navbar .nav-link.active {
   color: #ffc107 !important;
   font-weight: 700;
@@ -120,9 +153,56 @@ h3 {
 #nav-logo { transition: opacity .3s ease; }
 #nav-logo.fading { opacity: 0; }
 
+/* Center theme switcher in navbar */
+.navbar .container {
+  position: relative;
+}
+
+#navbarSupportedContent {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.navbar-nav.mx-auto {
+  position: absolute;
+  left: calc(50% - 120px);
+  transform: translateX(-50%);
+  width: auto;
+  top: 0;
+}
+
+/* Ensure Connect Wallet stays on the right */
+.navbar-nav.d-flex.flex-row {
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+}
+
 /* Navbar icon images */
 .navbar-nav .nav-icon img {
   width: 20px; height: 20px; object-fit: contain; display: block;
+}
+
+/* Collection selector in navbar */
+.collection-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collection-selector input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.navbar-scrolled .collection-selector input {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  color: #212529 !important;
+}
+
+.navbar-scrolled .collection-selector input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 /* =========================
@@ -143,24 +223,64 @@ h3 {
 ========================= */
 .intro {
   position: relative;
-  min-height: 100vh; /* use 100svh below when supported */
-  background-image: url('../img/mfbackground.png'); /* CSS file is in /css -> use ../img */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  min-height: auto;
+  background-color: #4a4a4a;
+  background-image: none;
+  overflow: visible;
 }
 .intro .mask {
-  background-color: rgba(0,0,0,0.4);   /* overlay for text readability */
-  position: absolute;
-  inset: 0;
+  background-color: transparent;
+  position: relative;
+  min-height: auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
+  overflow: visible;
 }
 
 /* Modern mobile viewport fix */
 @supports (height: 100svh) {
-  .intro { min-height: 100svh; }
+  .intro { min-height: auto; }
+}
+
+/* Reduce spacing between MY MINDFOLK and Connect Wallet button in MODERN theme only */
+body.theme-modern .intro #mainTitle {
+  margin-bottom: -0.5rem !important;
+}
+
+body.theme-modern .intro #mainTitle + div {
+  margin-top: -0.5rem !important;
+}
+
+/* Reduce Connect Wallet button width in MODERN theme */
+body.theme-modern #connectWalletBtn {
+  padding-left: 0.875rem !important;
+  padding-right: 0.875rem !important;
+}
+
+body.theme-modern #connectWalletBtnHero {
+  padding-left: 0.875rem !important;
+  padding-right: 0.875rem !important;
+}
+
+/* Disconnect button styling in MODERN theme - grey background matching MY MINDFOLK, same size as CLASSIC */
+body.theme-modern #disconnectWalletBtn {
+  background-color: #4a4a4a !important;
+  color: #fff !important;
+  border: none !important;
+  font-size: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  line-height: 1.5 !important;
+  min-height: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+}
+
+body.theme-modern #disconnectWalletBtn:hover {
+  background-color: #5a5a5a !important;
+  color: #fff !important;
 }
 
 /* =========================
@@ -168,25 +288,31 @@ h3 {
 ========================= */
 .footer-dark { background-color: #000; }
 
-/* iOS fixed-bg fallback */
-@supports (-webkit-touch-callout: none) {
-  #mindfolk-streak { background-attachment: scroll !important; }
-}
-
 /* =========================
    Utilities / Components
 ========================= */
 .mindfolk-logo { max-height: 35px; width: auto; margin-right: 4px; }
 
-/* Column centering adjustments */
-.col-lg-6.col-md-12 { display: flex; flex-direction: column; }
-.col-lg-6.col-md-12 p.mb-0 { text-align: left; }
+/* Loading indicator */
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
 /* =========================
    Media Queries
 ========================= */
 @media (max-width: 768px) {
-  .intro { background-position: top center; } /* keep the interesting top visible */
+  .intro { background-position: top center; }
   .intro img { max-height: 100px; }
   .intro h3 { font-size: 1.1rem; padding: 0 1rem; }
 
@@ -198,6 +324,21 @@ h3 {
   #navbarSupportedContent .nav-icon img { height: 18px; }
 
   .mindfolk-logo { max-height: 30px; }
+
+  .collection-selector {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .collection-selector input {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .collection-selector button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 576px) {
@@ -211,8 +352,17 @@ h3 {
 
   .mindfolk-logo { max-height: 25px; }
 }
-@media (max-width: 768px) {
-  .intro { background-position: top center; }
-  .intro img { max-height: 100px; }
-  .intro h3 { font-size: 1.1rem; padding: 0 1rem; }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

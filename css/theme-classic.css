@@ -1,0 +1,730 @@
+/* =========================
+   CLASSIC THEME
+   Replicating the original Mindfolk website design
+========================= */
+
+/* Import Poppins font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800;900&display=swap');
+
+/* Main Background */
+body.theme-classic {
+  background-color: #ebd59d !important;
+  color: #0a3e54;
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  line-height: 24px;
+}
+
+/* Decorative Brush Element */
+body.theme-classic::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 564px;
+  height: 564px;
+  background-image: url('../img/brush-round.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  z-index: -24;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Typography - Headings use Hipeless brush font (fallback to brush-style) */
+body.theme-classic h1,
+body.theme-classic h2,
+body.theme-classic h3,
+body.theme-classic h4,
+body.theme-classic h5 {
+  color: #0a3e54;
+  font-family: 'hipeless_brushregular', 'dirty_brushregular', cursive;
+  font-weight: 400;
+  line-height: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+body.theme-classic h1 {
+  font-size: 120px;
+  font-weight: 700;
+}
+
+body.theme-classic h2 {
+  font-size: 80px;
+}
+
+body.theme-classic h3 {
+  font-size: 42px;
+  font-weight: 700;
+}
+
+body.theme-classic h4 {
+  font-size: 32px;
+  line-height: 120%;
+}
+
+body.theme-classic h5 {
+  font-size: 28px;
+  line-height: 24px;
+}
+
+body.theme-classic h6 {
+  color: #0a3e54;
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 24px;
+  letter-spacing: 0.03em;
+}
+
+body.theme-classic p {
+  color: #0a3e54;
+  font-family: 'Poppins', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 24px;
+  margin-bottom: 0;
+}
+
+/* Orange accent spans */
+body.theme-classic .span-orange {
+  color: #0a3e54;
+  font-weight: 700;
+}
+
+/* Navigation */
+body.theme-classic .navbar {
+  background-color: #f8f0dc !important;
+}
+
+body.theme-classic .navbar.navbar-scroll {
+  background-color: #f8f0dc !important;
+}
+
+body.theme-classic .navbar-brand,
+body.theme-classic .nav-link {
+  color: #0a3e54 !important;
+}
+
+body.theme-classic .navbar-brand:hover,
+body.theme-classic .nav-link:hover {
+  color: #0a3e54 !important;
+  opacity: 0.8;
+}
+
+/* Navbar when scrolled - Lighter cream color */
+body.theme-classic .navbar.navbar-scrolled {
+  background-color: #f8f0dc !important;
+  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08) !important;
+}
+
+body.theme-classic .navbar.navbar-scrolled .navbar-brand,
+body.theme-classic .navbar.navbar-scrolled .nav-link,
+body.theme-classic .navbar.navbar-scrolled .fa-bars {
+  color: #0a3e54 !important;
+}
+
+body.theme-classic .navbar.navbar-scrolled .nav-link {
+  color: #0a3e54 !important;
+}
+
+/* Buttons - Dark Teal Background */
+body.theme-classic .btn {
+  background-color: #0a3e54;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+}
+
+body.theme-classic .btn:hover {
+  background-color: #0d4a63;
+  transform: scale(1.05);
+  color: #fff;
+}
+
+body.theme-classic .btn-outline-warning {
+  background-color: transparent;
+  border: 2px solid #0a3e54;
+  color: #0a3e54;
+}
+
+body.theme-classic .btn-outline-warning:hover {
+  background-color: #0a3e54;
+  color: #fff;
+}
+
+/* Disconnect button - same size as Connect Wallet */
+body.theme-classic #disconnectWalletBtn {
+  font-size: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  line-height: 1.5 !important;
+  min-height: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+}
+
+body.theme-classic .btn-warning {
+  background-color: #0a3e54;
+  color: #fff;
+  border: none;
+  /* Match MODERN theme size - Bootstrap btn-sm default */
+  font-size: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  line-height: 1.5 !important;
+  min-height: auto !important;
+}
+
+body.theme-classic .btn-warning:hover {
+  background-color: #0d4a63;
+  color: #fff;
+}
+
+/* Theme Label */
+body.theme-classic .theme-label {
+  color: #0a3e54 !important;
+  font-size: 0.9rem;
+}
+
+body.theme-classic .navbar.navbar-scrolled .theme-label {
+  color: #0a3e54 !important;
+}
+
+/* Theme Switcher Buttons - Match MODERN theme size exactly */
+body.theme-classic .theme-switcher .theme-btn {
+  border-color: #0a3e54;
+  color: #0a3e54;
+  /* Match MODERN theme size exactly */
+  min-width: 80px !important;
+  font-size: 0.875rem !important;
+  padding: 0.25rem 0.5rem !important;
+  line-height: 1.5 !important;
+  min-height: auto !important;
+  transition: all 0.2s ease !important;
+}
+
+body.theme-classic .theme-switcher .theme-btn:hover {
+  border-color: #0a3e54;
+  color: #fff;
+  background-color: rgba(10, 62, 84, 0.1);
+}
+
+body.theme-classic .theme-switcher .theme-btn.active {
+  background-color: #0a3e54;
+  border-color: #0a3e54;
+  color: #fff;
+}
+
+body.theme-classic .theme-switcher .theme-btn.active:hover {
+  background-color: #0a3e54;
+  border-color: #0a3e54;
+  color: #fff;
+}
+
+/* Intro/Hero Section */
+body.theme-classic .intro {
+  background-color: #ebd59d !important;
+  background-image: none !important;
+}
+
+body.theme-classic .intro .mask {
+  background-color: transparent !important;
+}
+
+body.theme-classic .intro h1,
+body.theme-classic .intro h2 {
+  color: #0a3e54;
+}
+
+/* Gallery Section - Wheat with brush image */
+body.theme-classic #gallery {
+  background-color: #ebd59d !important;
+  background-image: url('../img/brush-round.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: left center !important;
+  background-size: 800px auto !important;
+  background-attachment: fixed !important;
+  position: relative;
+  padding-top: 3rem;
+  padding-bottom: 5rem;
+}
+
+body.theme-classic #gallery::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(235, 213, 157, 0.3);
+  z-index: -1;
+}
+
+body.theme-classic .gallery-header-controls {
+  color: #0a3e54;
+}
+
+body.theme-classic .gallery-stats {
+  color: #0a3e54;
+}
+
+/* Mindfolk Collection Title - Bigger and Blue */
+body.theme-classic .gallery-title {
+  font-size: 3rem !important;
+  color: #0a3e54 !important;
+  font-weight: 700;
+}
+
+/* MY MINDFOLK Title - Cream Color */
+body.theme-classic #mainTitle {
+  color: #f8f0dc !important;
+  text-shadow: 2px 2px 4px rgba(10, 62, 84, 0.3);
+}
+
+/* Connect Wallet Button - Cream Background */
+body.theme-classic #connectWalletBtnHero {
+  background-color: #f8f0dc !important;
+  color: #0a3e54 !important;
+  border: 2px solid #0a3e54 !important;
+}
+
+body.theme-classic #connectWalletBtnHero:hover {
+  background-color: #f1e2bb !important;
+  color: #0a3e54 !important;
+  border-color: #0a3e54 !important;
+}
+
+/* NFT Count Number - Blue */
+body.theme-classic #totalCount,
+body.theme-classic #totalCount.badge,
+body.theme-classic .gallery-stats #totalCount {
+  background-color: #0a3e54 !important;
+  color: #fff !important;
+}
+
+/* NFT Cards - Copy MODERN theme structure exactly, just change colors */
+body.theme-classic .nft-card {
+  position: relative !important;
+  background: #f1e2bb !important; /* Cream instead of rgba(255, 255, 255, 0.05) */
+  border-radius: 1rem !important; /* Same as MODERN */
+  overflow: hidden !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important; /* Same as MODERN */
+  cursor: pointer !important;
+  border: 2px solid transparent !important; /* Same as MODERN */
+}
+
+body.theme-classic .nft-card:hover {
+  transform: translateY(-5px) !important; /* Same as MODERN */
+  box-shadow: 0 10px 30px rgba(10, 62, 84, 0.3) !important; /* Blue shadow instead of yellow */
+  border-color: #0a3e54 !important; /* Blue border instead of yellow */
+}
+
+/* Prevent card shrinking - ensure consistent sizing */
+body.theme-classic #galleryGrid > div,
+body.theme-classic #galleryGrid > .col {
+  transition: none !important;
+}
+
+/* Card Image - Same structure as MODERN */
+body.theme-classic .nft-card-image {
+  position: relative !important;
+  width: 100% !important;
+  padding-top: 100% !important; /* 1:1 Aspect Ratio - same as MODERN */
+  background: rgba(255, 255, 255, 0.05) !important; /* Same as MODERN */
+  overflow: hidden !important;
+}
+
+body.theme-classic .nft-card-image img {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 0.3s ease !important; /* Same as MODERN */
+}
+
+body.theme-classic .nft-card:hover .nft-card-image img {
+  transform: scale(1.05) !important; /* Same as MODERN */
+}
+
+/* NFT Card Name - Same structure as MODERN, just change colors */
+body.theme-classic .nft-card-name {
+  font-weight: 600 !important; /* Same as MODERN */
+  color: #0a3e54 !important; /* Blue instead of #fff */
+  margin-bottom: 0.125rem !important; /* Same as MODERN */
+  font-size: 0.9rem !important; /* Same as MODERN */
+  text-align: center !important; /* Same as MODERN */
+  white-space: nowrap !important; /* Same as MODERN */
+  overflow: hidden !important; /* Same as MODERN */
+  text-overflow: ellipsis !important; /* Same as MODERN */
+}
+
+/* 6 Col View - Even smaller name */
+body.theme-classic .gallery-view-6col .nft-card-name {
+  font-size: 0.75rem !important; /* Even smaller than 0.85rem */
+}
+
+/* MY GALLERY (Wallet Gallery) - Match Main Gallery name size */
+body.theme-classic #walletNFTsGrid .nft-card-name {
+  font-size: 0.75rem !important; /* Match 6 col view size */
+}
+
+/* 12 Col View - Much smaller name and type */
+body.theme-classic .gallery-view-12col .nft-card-name {
+  font-size: 0.65rem !important; /* Much smaller - same as MODERN */
+  white-space: normal !important; /* Allow wrapping */
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.3 !important;
+  min-height: 1.69em !important;
+}
+
+body.theme-classic .gallery-view-12col .nft-card-mint {
+  font-size: 0.55rem !important; /* A bit smaller than default 0.8rem */
+}
+
+/* NFT Card Body - Same structure as MODERN, just change colors */
+body.theme-classic .nft-card .nft-card-body,
+body.theme-classic .gallery-view-list .nft-card .nft-card-body,
+body.theme-classic .gallery-view-6col .nft-card .nft-card-body,
+body.theme-classic .gallery-view-12col .nft-card .nft-card-body,
+body.theme-classic .nft-card-body {
+  padding: 0.5rem 0.75rem !important; /* Same as MODERN */
+  background: #f8f0dc !important; /* Cream instead of rgba(0, 0, 0, 0.5) */
+  text-align: center !important; /* Same as MODERN */
+  color: #0a3e54 !important;
+}
+
+/* NFT Card Mint/Type - Same structure as MODERN, just change colors */
+body.theme-classic .nft-card-mint {
+  font-size: 0.8rem !important; /* Same as MODERN */
+  color: rgba(10, 62, 84, 0.7) !important; /* Blue with opacity instead of rgba(255, 255, 255, 0.7) */
+  font-family: monospace !important; /* Same as MODERN */
+  word-break: break-all !important; /* Same as MODERN */
+  text-align: center !important; /* Same as MODERN */
+}
+
+/* List View Cards - Same structure as MODERN, just change colors */
+body.theme-classic .gallery-view-list .nft-card {
+  display: flex !important; /* Same as MODERN */
+  flex-direction: row !important; /* Same as MODERN */
+  align-items: center !important; /* Same as MODERN */
+  padding: 0.1rem 0.35rem !important; /* Further reduced to decrease height */
+  border-radius: 0.25rem !important; /* Same as MODERN */
+  height: auto !important; /* Same as MODERN */
+  min-height: 24px !important; /* Further reduced from 28px to decrease height */
+  margin-bottom: 1px !important; /* Same as MODERN */
+  max-width: 330px !important; /* Increased from 325px by 5px */
+  background-color: #f8f0dc !important; /* Cream instead of default */
+}
+
+body.theme-classic .gallery-view-list .nft-card-image {
+  width: 30px !important; /* Same as MODERN */
+  height: 30px !important; /* Same as MODERN */
+  min-width: 30px !important; /* Same as MODERN */
+  padding-top: 0 !important; /* Same as MODERN */
+  border-radius: 0.2rem !important; /* Same as MODERN */
+}
+
+body.theme-classic .gallery-view-list .nft-card-image img {
+  position: relative !important; /* Same as MODERN */
+  width: 100% !important; /* Same as MODERN */
+  height: 100% !important; /* Same as MODERN */
+  object-fit: cover !important; /* Same as MODERN */
+}
+
+body.theme-classic .gallery-view-list .nft-card:hover {
+  transform: none !important; /* Same as MODERN */
+  background: rgba(241, 226, 187, 0.8) !important; /* Cream hover instead of rgba(255, 255, 255, 0.1) */
+}
+
+/* List View Card Body - Same structure as MODERN, just change colors */
+body.theme-classic .gallery-view-list .nft-card-body {
+  flex: 1 !important; /* Same as MODERN */
+  display: flex !important; /* Same as MODERN */
+  flex-direction: row !important; /* Same as MODERN */
+  align-items: center !important; /* Same as MODERN */
+  justify-content: flex-start !important; /* Same as MODERN */
+  gap: 1rem !important; /* Same as MODERN */
+  padding: 0 0.75rem !important; /* Same as MODERN */
+  background: transparent !important; /* Same as MODERN */
+  text-align: left !important; /* Same as MODERN */
+}
+
+body.theme-classic .gallery-view-list .nft-card-name {
+  margin-bottom: 0 !important; /* Same as MODERN */
+  font-size: 0.8rem !important; /* Slightly smaller than 0.85rem */
+  white-space: nowrap !important; /* Same as MODERN */
+  overflow: hidden !important; /* Same as MODERN */
+  text-overflow: ellipsis !important; /* Same as MODERN */
+  flex: 0 1 auto !important; /* Same as MODERN */
+  min-width: 0 !important; /* Same as MODERN */
+  text-align: left !important; /* Same as MODERN */
+  color: #0a3e54 !important; /* Blue instead of white */
+}
+
+body.theme-classic .gallery-view-list .nft-card-mint {
+  font-size: 0.75rem !important; /* Same as MODERN */
+  flex-shrink: 0 !important; /* Same as MODERN */
+  text-align: left !important; /* Same as MODERN */
+  max-width: 200px !important; /* Same as MODERN */
+  white-space: nowrap !important; /* Same as MODERN */
+  overflow: hidden !important; /* Same as MODERN */
+  text-overflow: ellipsis !important; /* Same as MODERN */
+  color: rgba(10, 62, 84, 0.7) !important; /* Blue with opacity */
+}
+
+
+/* Modal */
+body.theme-classic .modal-content {
+  background-color: #f8f0dc;
+  border: none;
+  border-radius: 28px;
+  color: #0a3e54;
+}
+
+body.theme-classic .modal-header {
+  border-bottom: 2px solid #0a3e54 !important; /* Blue line below NFT name */
+  background-color: #f1e2bb;
+  border-radius: 28px 28px 0 0;
+}
+
+body.theme-classic .modal-title {
+  color: #0a3e54;
+  font-family: 'hipeless_brushregular', cursive;
+  font-size: 32px;
+}
+
+body.theme-classic .modal-body {
+  color: #0a3e54;
+  border-top: 2px solid #0a3e54 !important; /* Blue line above the image */
+}
+
+/* Modal Details - Blue colors */
+body.theme-classic .nft-modal-details h4 {
+  color: #0a3e54 !important; /* Blue for "Attributes & Traits" heading */
+}
+
+body.theme-classic .nft-modal-details .detail-label {
+  color: #0a3e54 !important; /* Blue for "Mint Address" label */
+}
+
+body.theme-classic .nft-modal-details .detail-value {
+  color: #0a3e54 !important; /* Blue for the hash value */
+}
+
+body.theme-classic .nft-modal-details .detail-item {
+  border-bottom: 1px solid #0a3e54 !important; /* Blue line between hash and Attributes & Traits */
+}
+
+body.theme-classic .btn-close {
+  filter: invert(1) brightness(0.3);
+}
+
+/* NFT Modal Traits */
+body.theme-classic .nft-modal-trait {
+  background-color: #eedbaa;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+body.theme-classic .nft-modal-trait .trait-name {
+  color: #0a3e54;
+  font-weight: 700;
+}
+
+body.theme-classic .nft-modal-trait .trait-value {
+  color: #0a3e54;
+}
+
+/* Load More Buttons */
+body.theme-classic .load-more-btn,
+body.theme-classic .load-all-btn {
+  background-color: #0a3e54;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+body.theme-classic .load-more-btn:hover,
+body.theme-classic .load-all-btn:hover {
+  background-color: #0d4a63;
+  color: #fff;
+}
+
+/* Wallet Modal */
+body.theme-classic .wallet-modal-content {
+  background-color: #f8f0dc;
+  border-radius: 28px;
+}
+
+body.theme-classic .wallet-modal-header {
+  background-color: #f1e2bb;
+  border-radius: 28px 28px 0 0;
+  color: #0a3e54;
+}
+
+body.theme-classic .wallet-modal-body {
+  color: #0a3e54;
+}
+
+body.theme-classic .wallet-card {
+  background-color: #eedbaa;
+  border: 2px solid transparent;
+  border-radius: 16px;
+}
+
+body.theme-classic .wallet-card:hover {
+  border-color: #0a3e54;
+  background-color: #f1e2bb;
+}
+
+/* Chips/Badges */
+body.theme-classic .chip,
+body.theme-classic .badge {
+  background-color: #0a3e54;
+  color: #fff;
+  border-radius: 1000px;
+  padding: 4px 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+/* View Switcher Buttons - Smaller (STRONGER SELECTOR) */
+body.theme-classic .gallery-view-switcher .gallery-view-btn,
+body.theme-classic .gallery-view-switcher .btn {
+  min-width: 50px !important;
+  padding: 0.2rem 0.5rem !important;
+  font-size: 0.7rem !important;
+  border: 1px solid #0a3e54 !important;
+  height: auto !important;
+  background-color: transparent !important;
+  color: #0a3e54 !important;
+}
+
+body.theme-classic .gallery-view-switcher .btn.active,
+body.theme-classic .gallery-view-switcher .gallery-view-btn.active {
+  background-color: #0a3e54 !important;
+  color: #fff !important;
+  border-color: #0a3e54 !important;
+}
+
+body.theme-classic .gallery-view-switcher .btn:hover,
+body.theme-classic .gallery-view-switcher .gallery-view-btn:hover {
+  background-color: rgba(10, 62, 84, 0.1) !important;
+  color: #0a3e54 !important;
+}
+
+body.theme-classic .gallery-view-switcher .btn.active:hover,
+body.theme-classic .gallery-view-switcher .gallery-view-btn.active:hover {
+  background-color: #0d4a63 !important;
+  color: #fff !important;
+}
+
+/* Section Backgrounds */
+body.theme-classic section {
+  background-color: transparent;
+}
+
+/* Custom Scrollbar */
+body.theme-classic ::-webkit-scrollbar {
+  width: 12px;
+}
+
+body.theme-classic ::-webkit-scrollbar-track {
+  background: #eedbaa;
+}
+
+body.theme-classic ::-webkit-scrollbar-thumb {
+  background: #0a3e54;
+  border-radius: 6px;
+}
+
+body.theme-classic ::-webkit-scrollbar-thumb:hover {
+  background: #0d4a63;
+}
+
+/* Links */
+body.theme-classic a {
+  color: #0a3e54;
+}
+
+body.theme-classic a:hover {
+  color: #0d4a63;
+  opacity: 0.8;
+}
+
+/* Input Fields */
+body.theme-classic input,
+body.theme-classic textarea,
+body.theme-classic select {
+  background-color: #f8f0dc;
+  border: 2px solid #0a3e54;
+  border-radius: 12px;
+  color: #0a3e54;
+  font-family: 'Poppins', sans-serif;
+}
+
+body.theme-classic input:focus,
+body.theme-classic textarea:focus,
+body.theme-classic select:focus {
+  background-color: #fff;
+  border-color: #0a3e54;
+  color: #0a3e54;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 62, 84, 0.1);
+}
+
+/* Override any black backgrounds */
+body.theme-classic .bg-dark,
+body.theme-classic .bg-black {
+  background-color: #f1e2bb !important;
+}
+
+body.theme-classic .text-white {
+  color: #0a3e54 !important;
+}
+
+/* Ensure text is readable */
+body.theme-classic .text-muted {
+  color: rgba(10, 62, 84, 0.7) !important;
+}
+
+/* $WOOD Text - Cream Color */
+body.theme-classic .token-balance-display .text-white,
+body.theme-classic #tokenBalanceDisplay .text-white,
+body.theme-classic .token-amount .text-white,
+body.theme-classic .token-amount span.text-white {
+  color: #f8f0dc !important; /* Cream color for $WOOD - override inline styles */
+}
+
+/* WOOD balance positioning - match MODERN theme exactly */
+body.theme-classic #tokenBalanceDisplay,
+body.theme-classic #tokenBalanceDisplay.mt-3,
+body.theme-classic .token-balance-display {
+  margin-top: 0.5rem !important; /* Reduced to move up and match MODERN theme */
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Ensure Connect Wallet button container spacing matches MODERN */
+body.theme-classic #connectWalletBtnHero {
+  margin-bottom: 0 !important;
+}
+
+body.theme-classic #connectWalletBtnHero + #tokenBalanceDisplay,
+body.theme-classic .mt-2 + #tokenBalanceDisplay {
+  margin-top: 0.5rem !important;
+}
