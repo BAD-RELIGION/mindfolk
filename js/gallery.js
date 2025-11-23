@@ -103,10 +103,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   if (!collectionAddress) {
     collectionAddress = DEFAULT_COLLECTION;
-    // Update URL without reload
-    const url = new URL(window.location);
-    url.searchParams.set('collection', collectionAddress);
-    window.history.replaceState({}, '', url);
   }
   
   // Load the collection automatically - no input field needed
@@ -197,11 +193,6 @@ async function handleLoadCollection() {
     alert('Please enter a collection address');
     return;
   }
-
-  // Update URL without reload
-  const url = new URL(window.location);
-  url.searchParams.set('collection', address);
-  window.history.pushState({}, '', url);
 
   await loadCollection(address);
 }
