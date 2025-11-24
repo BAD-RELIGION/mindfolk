@@ -728,3 +728,8 @@ body.theme-classic #connectWalletBtnHero + #tokenBalanceDisplay,
 body.theme-classic .mt-2 + #tokenBalanceDisplay {
   margin-top: 0.5rem !important;
 }
+
+/* Footer Copyright Text - Cream Color for Classic Theme */
+body.theme-classic .footer-copyright {
+  color: #f8f0dc !important; /* Cream color */
+}
