@@ -45,6 +45,8 @@ let collectionNFTDataMap = new Map(); // Map mint address to NFT data from JSON 
 let founderMetadataMap = new Map(); // Map mint address to full founder metadata for modal display
 let popupImageMapByName = new Map(); // Map NFT name to popup image URL (from CSV column F)
 let popupImageMapByMint = new Map(); // Map mint address to popup image URL (from CSV column F)
+let arweaveImageMap = new Map(); // Map filename to Arweave URL (from arweave_image_mapping.json)
+let arweaveMintMap = new Map(); // Map mint ID to Arweave URL (from merged_mindfolk_data.json)
 let mainGalleryView = localStorage.getItem('mainGalleryView') || '6col'; // View mode for main gallery only
 
 // Default collection address
@@ -95,6 +97,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (error) {
     console.warn('Could not load popup image URLs:', error);
+  }
+  
+  // Load Arweave image mappings
+  try {
+    const response = await fetch('arweave_image_mapping.json');
+    if (response.ok) {
+      const arweaveData = await response.json();
+      // Populate map from JSON (filename -> Arweave URL)
+      Object.entries(arweaveData).forEach(([filename, url]) => {
+        if (filename && url) {
+          arweaveImageMap.set(filename.trim(), url.trim());
+        }
+      });
+      console.log(`✓ Loaded ${arweaveImageMap.size} Arweave image mappings`);
+    }
+  } catch (error) {
+    console.warn('Could not load Arweave image mappings:', error);
+  }
+  
+  // Load merged Mindfolk data (mint ID -> Arweave URL)
+  // Note: This file uses JavaScript object notation, so we need to parse it carefully
+  try {
+    const response = await fetch('merged_mindfolk_data.json');
+    if (response.ok) {
+      const text = await response.text();
+      // Try to parse as JSON first (in case it's valid JSON)
+      let mergedData;
+      try {
+        mergedData = JSON.parse(text);
+      } catch (parseError) {
+        // If JSON parsing fails, try to evaluate as JavaScript (not recommended but needed for this format)
+        // We'll use Function constructor to safely evaluate
+        try {
+          mergedData = new Function('return ' + text)();
+        } catch (evalError) {
+          console.warn('Could not parse merged Mindfolk data:', evalError);
+          mergedData = null;
+        }
+      }
+      
+      if (mergedData && Array.isArray(mergedData)) {
+        mergedData.forEach(item => {
+          if (item.mintid && item.metadata) {
+            arweaveMintMap.set(item.mintid.trim(), item.metadata.trim());
+          }
+        });
+        console.log(`✓ Loaded ${arweaveMintMap.size} Arweave URLs by mint ID`);
+      }
+    }
+  } catch (error) {
+    console.warn('Could not load merged Mindfolk data:', error);
   }
   
   // Check if collection address is in URL params, otherwise use default
@@ -241,6 +294,7 @@ async function loadCollection(collectionAddress) {
       
       // Display first batch
       displayNFTs(displayedNFTs.slice(0, CONFIG.BATCH_SIZE));
+      currentPage = 1; // Set to 1 so first "Load More" click loads the next batch
       updateLoadMoreButton();
       
       // Apply current view mode to main gallery
@@ -1002,6 +1056,136 @@ function createNFTCard(nft, isMainGallery = true) {
   return col;
 }
 
+/**
+ * Find .gif URL from Arweave by matching NFT name to filename
+ * @param {string} nftName - The NFT name
+ * @param {string} nftMint - The NFT mint address (optional, for fallback)
+ * @returns {string|null} - The .gif URL from Arweave, or null if not found
+ */
+function findArweaveGifUrl(nftName, nftMint = '') {
+  if (!nftName) return null;
+  
+  // Try direct name match first (e.g., "Foster Mountain Elder" -> "Foster Mountain Elder.gif")
+  const directMatch = `${nftName}.gif`;
+  if (arweaveImageMap.has(directMatch)) {
+    return arweaveImageMap.get(directMatch);
+  }
+  
+  // Try with sanitized name (replace # with _)
+  const sanitizedName = nftName.replace(/#/g, '_');
+  const sanitizedMatch = `${sanitizedName}.gif`;
+  if (arweaveImageMap.has(sanitizedMatch)) {
+    return arweaveImageMap.get(sanitizedMatch);
+  }
+  
+  // Handle "Mindfolk Founder #N" -> "Mindfolk_Founder_000N.gif"
+  if (nftName.startsWith('Mindfolk Founder #')) {
+    const number = nftName.replace('Mindfolk Founder #', '').trim();
+    const paddedNumber = number.padStart(4, '0');
+    const founderMatch = `Mindfolk_Founder_${paddedNumber}.gif`;
+    if (arweaveImageMap.has(founderMatch)) {
+      return arweaveImageMap.get(founderMatch);
+    }
+  }
+  
+  // Handle "Mindfolk Elder #N" (Mushroom Heads) -> "Mindfolk_Mushroom_00NN.gif"
+  if (nftName.startsWith('Mindfolk Elder #')) {
+    const number = nftName.replace('Mindfolk Elder #', '').trim();
+    const paddedNumber = number.padStart(4, '0');
+    const mushroomMatch = `Mindfolk_Mushroom_${paddedNumber}.gif`;
+    if (arweaveImageMap.has(mushroomMatch)) {
+      return arweaveImageMap.get(mushroomMatch);
+    }
+  }
+  
+  // Try case-insensitive search through all Arweave keys
+  for (const [filename, url] of arweaveImageMap.entries()) {
+    if (filename.toLowerCase().endsWith('.gif')) {
+      // Remove .gif extension and compare
+      const nameWithoutExt = filename.replace(/\.gif$/i, '');
+      if (nameWithoutExt.toLowerCase() === nftName.toLowerCase() ||
+          nameWithoutExt.toLowerCase() === sanitizedName.toLowerCase()) {
+        return url;
+      }
+    }
+  }
+  
+  // Fallback: Try to get from merged data by mint ID (if it's a .gif URL)
+  if (nftMint && arweaveMintMap.has(nftMint)) {
+    const url = arweaveMintMap.get(nftMint);
+    // Check if URL points to a .gif (we can't verify file type, but if it's from merged data, it should be correct)
+    // For now, we'll trust the merged data
+    return url;
+  }
+  
+  return null;
+}
+
+/**
+ * Find .png URL from Arweave by matching NFT name to filename
+ * @param {string} nftName - The NFT name
+ * @param {string} nftMint - The NFT mint address (optional, for fallback)
+ * @returns {string|null} - The .png URL from Arweave, or null if not found
+ */
+function findArweavePngUrl(nftName, nftMint = '') {
+  if (!nftName) return null;
+  
+  // Try direct name match first (e.g., "Mindfolk Founder #8" -> "Mindfolk_Founder_0008.png")
+  const directMatch = `${nftName}.png`;
+  if (arweaveImageMap.has(directMatch)) {
+    return arweaveImageMap.get(directMatch);
+  }
+  
+  // Try with sanitized name (replace # with _)
+  const sanitizedName = nftName.replace(/#/g, '_');
+  const sanitizedMatch = `${sanitizedName}.png`;
+  if (arweaveImageMap.has(sanitizedMatch)) {
+    return arweaveImageMap.get(sanitizedMatch);
+  }
+  
+  // Handle "Mindfolk Founder #N" -> "Mindfolk_Founder_000N.png"
+  if (nftName.startsWith('Mindfolk Founder #')) {
+    const number = nftName.replace('Mindfolk Founder #', '').trim();
+    const paddedNumber = number.padStart(4, '0');
+    const founderMatch = `Mindfolk_Founder_${paddedNumber}.png`;
+    if (arweaveImageMap.has(founderMatch)) {
+      return arweaveImageMap.get(founderMatch);
+    }
+  }
+  
+  // Handle "Mindfolk Elder #N" (Mushroom Heads) -> "Mindfolk_Mushroom_00NN.png"
+  if (nftName.startsWith('Mindfolk Elder #')) {
+    const number = nftName.replace('Mindfolk Elder #', '').trim();
+    const paddedNumber = number.padStart(4, '0');
+    const mushroomMatch = `Mindfolk_Mushroom_${paddedNumber}.png`;
+    if (arweaveImageMap.has(mushroomMatch)) {
+      return arweaveImageMap.get(mushroomMatch);
+    }
+  }
+  
+  // Try case-insensitive search through all Arweave keys
+  for (const [filename, url] of arweaveImageMap.entries()) {
+    if (filename.toLowerCase().endsWith('.png')) {
+      // Remove .png extension and compare
+      const nameWithoutExt = filename.replace(/\.png$/i, '');
+      if (nameWithoutExt.toLowerCase() === nftName.toLowerCase() ||
+          nameWithoutExt.toLowerCase() === sanitizedName.toLowerCase()) {
+        return url;
+      }
+    }
+  }
+  
+  // Fallback: Try to get from merged data by mint ID
+  if (nftMint && arweaveMintMap.has(nftMint)) {
+    const url = arweaveMintMap.get(nftMint);
+    // For .png, we'll check if the URL doesn't end with .gif (merged data might have either)
+    // Actually, let's just return it and trust the merged data
+    return url;
+  }
+  
+  return null;
+}
+
 function handleSearch(e) {
   const query = e.target.value.toLowerCase().trim();
   
@@ -1077,6 +1261,13 @@ function showNFTModal(nft) {
   const nftName = (nft.name && nft.name.trim()) ? nft.name.trim() : '';
   const nftMint = (nft.mint && nft.mint.trim()) ? nft.mint.trim() : '';
   
+  // Check if NFT type is "OG" first (before Elder check)
+  const isOGType = allAttributes.some(attr => {
+    const traitType = (attr.trait_type || attr.traitType || '').toString().toLowerCase();
+    const traitValue = (attr.value || attr.Value || '').toString().toLowerCase();
+    return (traitType === 'type' && traitValue === 'og') || traitValue === 'og';
+  });
+  
   // Check if NFT type is "Elder" to prioritize CSV column F links
   const isElderType = allAttributes.some(attr => {
     const traitType = (attr.trait_type || attr.traitType || '').toString().toLowerCase();
@@ -1084,25 +1275,79 @@ function showNFTModal(nft) {
     return (traitType === 'type' && traitValue === 'elder') || traitValue === 'elder';
   });
   
-  // For Elder types, use local 380x380 popup images first, but keep original URL for clickable link
-  let elderOriginalUrl = ''; // Store original URL for Elder types
-  if (isElderType) {
-    // Priority 1: Use local popup image (380x380) from img/Elders folder for preview
-    const sanitizedName = nftName.replace(/#/g, '_');
-    modalImageUrl = `img/Elders/${sanitizedName}.jpg`;
+  // Check if NFT is a Founder (by name pattern "Mindfolk Founder #N")
+  const isFounderType = nftName && nftName.startsWith('Mindfolk Founder #');
+  
+  // Store original URL for Elder types (needed for clickable link)
+  let elderOriginalUrl = '';
+  
+  // For OG types, use .png from Arweave for the left image
+  if (isOGType) {
+    const pngUrl = findArweavePngUrl(nftName, nftMint);
+    if (pngUrl) {
+      modalImageUrl = pngUrl;
+      console.log(`✓ Found .png for OG left image: ${nftName} -> ${pngUrl.substring(0, 50)}...`);
+    } else {
+      // Fallback to original logic if .png not found
+      if (nft.originalImage && nft.originalImage.trim()) {
+        modalImageUrl = nft.originalImage.trim();
+      } else if (nft.image && nft.image.trim()) {
+        modalImageUrl = nft.image.trim();
+      }
+      console.warn(`⚠ Could not find .png for OG left image: ${nftName}`);
+    }
+  }
+  // For Elder types, use Arweave links (prefer .gif, fallback to .png)
+  else if (isElderType) {
+    // Try .gif first
+    const gifUrl = findArweaveGifUrl(nftName, nftMint);
+    if (gifUrl) {
+      modalImageUrl = gifUrl;
+      console.log(`✓ Found .gif for Elder: ${nftName} -> ${gifUrl.substring(0, 50)}...`);
+    } else {
+      // Fallback to .png
+      const pngUrl = findArweavePngUrl(nftName, nftMint);
+      if (pngUrl) {
+        modalImageUrl = pngUrl;
+        console.log(`✓ Found .png for Elder (fallback): ${nftName} -> ${pngUrl.substring(0, 50)}...`);
+      } else {
+        // Final fallback to local image
+        const sanitizedName = nftName.replace(/#/g, '_');
+        modalImageUrl = `img/Elders/${sanitizedName}.jpg`;
+        console.warn(`⚠ Could not find Arweave link for Elder: ${nftName}, using local image`);
+      }
+    }
     
-    // Store original Google Drive URL for the clickable link
-    if (nftName && popupImageMapByName.has(nftName)) {
-      elderOriginalUrl = popupImageMapByName.get(nftName);
-    } else if (nftMint && popupImageMapByMint.has(nftMint)) {
-      elderOriginalUrl = popupImageMapByMint.get(nftMint);
-    } else if (nft.originalImage && nft.originalImage.trim()) {
-      elderOriginalUrl = nft.originalImage.trim();
-    } else if (nft.image && nft.image.trim()) {
-      elderOriginalUrl = nft.image.trim();
+    // Store Arweave URL for the clickable link (use the one we found)
+    elderOriginalUrl = modalImageUrl && !modalImageUrl.startsWith('img/') && !modalImageUrl.startsWith('data:') 
+      ? modalImageUrl 
+      : (nft.originalImage || nft.image || '');
+  }
+  // For Founder types, use Arweave links (prefer .gif, fallback to .png)
+  else if (isFounderType) {
+    // Try .gif first
+    const gifUrl = findArweaveGifUrl(nftName, nftMint);
+    if (gifUrl) {
+      modalImageUrl = gifUrl;
+      console.log(`✓ Found .gif for Founder: ${nftName} -> ${gifUrl.substring(0, 50)}...`);
+    } else {
+      // Fallback to .png
+      const pngUrl = findArweavePngUrl(nftName, nftMint);
+      if (pngUrl) {
+        modalImageUrl = pngUrl;
+        console.log(`✓ Found .png for Founder (fallback): ${nftName} -> ${pngUrl.substring(0, 50)}...`);
+      } else {
+        // Final fallback to original image
+        if (nft.originalImage && nft.originalImage.trim()) {
+          modalImageUrl = nft.originalImage.trim();
+        } else if (nft.image && nft.image.trim()) {
+          modalImageUrl = nft.image.trim();
+        }
+        console.warn(`⚠ Could not find Arweave link for Founder: ${nftName}`);
+      }
     }
   } else {
-    // For non-Elder types, use original priority order
+    // For non-Elder, non-OG types, use original priority order
     // Priority 1: Use originalImage
     if (nft.originalImage && nft.originalImage.trim()) {
       modalImageUrl = nft.originalImage.trim();
@@ -1137,20 +1382,16 @@ function showNFTModal(nft) {
   }
   
   // Get the original image URL for the clickable link
-  // For Elder types, use the stored original Google Drive URL; otherwise use modal image URL
+  // For Elder types, use the Arweave URL; for OGs use Arweave .png; for Founders use Arweave URL; otherwise use modal image URL
   let originalImageUrl = '';
   if (isElderType && elderOriginalUrl) {
     originalImageUrl = elderOriginalUrl;
+  } else if (isOGType || isFounderType) {
+    // For OGs and Founders, use the Arweave URL for the clickable link
+    originalImageUrl = modalImageUrl && !modalImageUrl.startsWith('data:') && !modalImageUrl.startsWith('img/') ? modalImageUrl : (nft.originalImage || nft.image || '');
   } else {
     originalImageUrl = modalImageUrl && !modalImageUrl.startsWith('data:') ? modalImageUrl : (nft.originalImage || nft.image || '');
   }
-  
-  // Check if NFT type is "OG" to show second image
-  const isOGType = allAttributes.some(attr => {
-    const traitType = (attr.trait_type || attr.traitType || '').toString().toLowerCase();
-    const traitValue = (attr.value || attr.Value || '').toString().toLowerCase();
-    return (traitType === 'type' && traitValue === 'og') || traitValue === 'og';
-  });
   
   // List of specific NFTs that should show a second image (by name or mint address)
   const secondImageNFTs = [
@@ -1159,7 +1400,8 @@ function showNFTModal(nft) {
     'Falcon Town Elder',
     'Metto Space Elder',
     'Ock Water Elder',
-    'Edward Sky Elder'
+    'Edward Sky Elder',
+    'Swanson Wood Elder'
   ];
   const secondImageMints = [
     'CEdJLfpZEbQXGg9yPWqoYXrnGPotthL2S74jKgDYF3o2', // Foster Mountain Elder
@@ -1167,7 +1409,8 @@ function showNFTModal(nft) {
     'FW2dG1FZ6uTWvsQ8ZX95MKK1vvAdVrKsXjuvC98JGn7i', // Falcon Town Elder
     '9PQbgyPjpPGpP5xo1VumxCZwMciJ8YphWaTa7feXijzx', // Metto Space Elder
     'DW92g3fivhApR7Gu9mSBkEghGzgwKcP94Wn2urUwzbcp', // Ock Water Elder
-    'FEBUmR4qWf4kxkt3FwU6MhdbPhFPZeygcWk7cgzXWhKt'  // Edward Sky Elder
+    'FEBUmR4qWf4kxkt3FwU6MhdbPhFPZeygcWk7cgzXWhKt',  // Edward Sky Elder
+    '4V6wSRGXj8ofcvYZHV4W7xpYaq5QnNpKJMHbBm6GXb8X'  // Swanson Wood Elder
   ];
   
   // Check if this NFT should show a second image
@@ -1175,8 +1418,26 @@ function showNFTModal(nft) {
     secondImageNFTs.includes(nftName) || 
     (nftMint && secondImageMints.includes(nftMint));
   
-  // For NFTs that need a second image, use the same image for now (will be replaced later with actual second image URL)
-  const secondImageUrl = shouldShowSecondImage ? modalImageUrl : null;
+  // For NFTs that need a second image, find the .gif version from Arweave (or .png if .gif not available)
+  let secondImageUrl = null;
+  if (shouldShowSecondImage) {
+    const gifUrl = findArweaveGifUrl(nftName, nftMint);
+    if (gifUrl) {
+      secondImageUrl = gifUrl;
+      console.log(`✓ Found .gif for second image: ${nftName} -> ${gifUrl.substring(0, 50)}...`);
+    } else {
+      // If .gif not found, try .png from Arweave (for cases like Metto Space Elder)
+      const pngUrl = findArweavePngUrl(nftName, nftMint);
+      if (pngUrl) {
+        secondImageUrl = pngUrl;
+        console.log(`✓ Found .png for second image (fallback): ${nftName} -> ${pngUrl.substring(0, 50)}...`);
+      } else {
+        // Final fallback to same image if neither .gif nor .png found
+        secondImageUrl = modalImageUrl;
+        console.warn(`⚠ Could not find .gif or .png for second image: ${nftName}`);
+      }
+    }
+  }
   
   modalContent.innerHTML = `
     <div class="nft-modal-images" ${shouldShowSecondImage ? 'style="grid-column: 1 / -1;"' : ''}>

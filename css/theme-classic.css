@@ -378,7 +378,7 @@ body.theme-classic #walletNFTsGrid .nft-card-name {
 
 /* 12 Col View - Much smaller name and type */
 body.theme-classic .gallery-view-12col .nft-card-name {
-  font-size: 0.65rem !important; /* Much smaller - same as MODERN */
+  font-size: calc(0.65rem - 1px) !important; /* 1px smaller */
   white-space: normal !important; /* Allow wrapping */
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
@@ -577,6 +577,12 @@ body.theme-classic .wallet-modal-header {
 
 body.theme-classic .wallet-modal-body {
   color: #0a3e54;
+}
+
+/* Wallet Modal Subtitle - Cream Color and Smaller Size */
+body.theme-classic .wallet-modal-subtitle {
+  color: #f8f0dc !important; /* Cream color */
+  font-size: 0.9rem !important; /* Match Modern theme size */
 }
 
 body.theme-classic .wallet-card {

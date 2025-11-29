@@ -1,0 +1,16 @@
+{
+  "name": "mindfolk-arweave-uploader",
+  "version": "1.0.0",
+  "description": "Upload Mindfolk images to Arweave via Irys using Phantom wallet",
+  "main": "upload-to-irys.js",
+  "type": "module",
+  "scripts": {
+    "upload": "node upload-to-irys.js"
+  },
+  "dependencies": {
+    "@irys/sdk": "^0.2.11",
+    "@solana/web3.js": "^1.87.6",
+    "bs58": "^5.0.0"
+  }
+}
+
